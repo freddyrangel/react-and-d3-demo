@@ -2,9 +2,10 @@
 import React, { Component } from 'react';
 import d3 from 'd3';
 
-const Bar = ({ x, y, width, height }) => (
+const Bar = ({ x, y, width, height, name }) => (
     <rect x={x} y={y} width={width} height={height}
-          style={{fill: 'steelblue'}} />
+          style={{fill: 'steelblue'}}
+          title={name} />
 );
 
 class Barchart extends Component {
@@ -34,6 +35,7 @@ class Barchart extends Component {
                          y={-valScale(values.length)}
                          width={barWidth}
                          height={valScale(values.length)}
+                         name={key}
                          key={`bar-${key}`} />
                  ))}
             </g>
