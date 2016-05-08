@@ -2,6 +2,8 @@
 import React, { Component } from 'react';
 import d3 from 'd3';
 
+import Piechart from './components/Piechart';
+
 class App extends Component {
     state = {data: []}
 
@@ -21,11 +23,20 @@ class App extends Component {
 
     render() {
 
+        let pieData = [{label: 'Is coder',
+                        value: this.state.data.filter((d) => d.already_working).length},
+                       {label: 'Not coder',
+                        value: this.state.data.filter((d) => !d.already_working).length}];
+
         return (
             <div className="container">
                 <h2>A FreeCodeCamp Survey exploration</h2>
                 <svg width="800" height="600">
-
+                    <Piechart x="200"
+                              y="200"
+                              innerRadius="50"
+                              outerRadius="150"
+                              data={pieData} />
                 </svg>
             </div>
         );
