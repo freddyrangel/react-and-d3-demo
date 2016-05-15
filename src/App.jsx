@@ -4,9 +4,11 @@ import d3 from 'd3';
 
 import Piechart from './components/Piechart';
 import Barchart from './components/Barchart';
+import Filter from './components/Filter';
 
 class App extends Component {
-    state = {data: []}
+    state = {data: [],
+             filter: () => true}
 
     componentWillMount() {
         d3.csv('data/survey_data_part1.csv')
@@ -22,17 +24,26 @@ class App extends Component {
           });
     }
 
+    updateFilter(filter) {
+        this.setState({filter: filter});
+    }
+
     render() {
+        let filteredData = this.state.data.filter(this.state.filter);
+
+        debugger;
 
         return (
             <div className="container">
                 <h2>A FreeCodeCamp Survey exploration</h2>
+                <Filter filterByKey="already_working"
+                        getFilter={::this.updateFilter}/>
                 <svg width="800" height="600">
                     <Barchart x="20"
                               y="100"
                               height="300"
                               width="500"
-                              data={this.state.data}
+                              data={filteredData}
                               value={(d) => d.which_role} />
                 </svg>
             </div>
