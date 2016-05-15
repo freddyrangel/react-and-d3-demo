@@ -29,7 +29,7 @@ class App extends Component {
                 <h2>A FreeCodeCamp Survey exploration</h2>
                 <svg width="800" height="600">
                     <Barchart x="20"
-                              y="400"
+                              y="100"
                               height="300"
                               width="500"
                               data={this.state.data}

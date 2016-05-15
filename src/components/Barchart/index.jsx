@@ -8,13 +8,25 @@ const Bar = ({ x, y, width, height, name }) => (
           title={name} />
 );
 
-class Barchart extends Component {
-    constructor() {
-        super();
+const LabeledBar = ({name, x, y, height, labelMargin, ...params}) => {
+    let transform = `translate(${x}, ${y})`;
 
-        this.xScale = d3.scaleLinear();
-        this.yScale = d3.scaleOrdinal();
-    }
+    return (
+        <g transform={transform}>
+            <text y={height/2+3} x={labelMargin-10}
+                  textAnchor="end">{name}</text>
+            <Bar x={labelMargin}
+                 y="0"
+                 height={height}
+                 {...params} />
+        </g>
+    );
+};
+
+class Barchart extends Component {
+    labelMargin = 200;
+    xScale = d3.scaleLinear();
+    yScale = d3.scaleOrdinal();
 
     componentWillMount() {
         this.updateD3(this.props);
@@ -35,7 +47,7 @@ class Barchart extends Component {
         this.xScale
             .domain([0, d3.max(counts,
                                ({key, values}) => values.length)])
-            .range([0, newProps.width]);
+            .range([0, newProps.width-this.labelMargin]);
 
         this.yScale
             .domain(counts.map(({key, values}) => key))
@@ -50,12 +62,13 @@ class Barchart extends Component {
         return (
             <g transform={transform}>
                 {this.counts.map(({ key, values }, i) => (
-                    <Bar x={0}
-                         y={-this.yScale(i)}
-                         width={this.xScale(values.length)}
-                         height={barHeight}
-                         name={key}
-                         key={`bar-${key}`} />
+                    <LabeledBar x={0}
+                                y={this.yScale(i)}
+                                width={this.xScale(values.length)}
+                                height={barHeight}
+                                name={key}
+                                key={`bar-${key}`}
+                                labelMargin={this.labelMargin}/>
                  ))}
             </g>
         );
