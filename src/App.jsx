@@ -5,23 +5,40 @@ import d3 from 'd3';
 import Piechart from './components/Piechart';
 import Barchart from './components/Barchart';
 import Filter from './components/Filter';
+import BucketedScatterPlot from './components/BucketedScatterPlot';
 
 class App extends Component {
     state = {data: [],
              filter: () => true}
 
+    parseRow(d) {
+        return {
+            which_role: d.JobRoleInterest || '',
+            already_working: Boolean(Number(d.IsSoftwareDev)),
+            expect_earn: Number(d.ExpectedEarning),
+            age: Number(d.Age),
+            hours_learning: Number(d.HoursLearning),
+            income: Number(d.Income),
+            job_preference: Number(d.JobPref),
+            job_where: Number(d.JobWherePref)
+        };
+    }
+
+    fixRow(d) {
+        if (d.expect_earn < 10000) {
+            d.expect_earn *= 12;
+        }
+
+        return d;
+    }
+
     componentWillMount() {
-        d3.csv('data/survey_data_part1.csv')
-          .row((d) => {
-              return {
-                  which_role: d['Which one of these roles are you most interested in?'],
-                  already_working: Boolean(Number(d['Are you already working as a software developer?'])),
-                  expect_earn: Number(d['About how much money do you expect to earn per year at your first developer job (in US Dollars)?'])
-              };
-          })
-          .get((error, rows) => {
-              this.setState({data: rows});
+        d3.csv('https://raw.githubusercontent.com/erictleung/2016-new-coder-survey/clean-and-combine-data/clean-data/2016-FCC-New-Coders-Survey-Data.csv')
+          .row((d) => this.fixRow(this.parseRow(d)))
+          .get((err, data) => {
+              this.setState({data: data.filter((d) => d.expect_earn)});
           });
+
     }
 
     updateFilter(filter) {
@@ -31,8 +48,6 @@ class App extends Component {
     render() {
         let filteredData = this.state.data.filter(this.state.filter);
 
-        debugger;
-
         return (
             <div className="container">
                 <h2>A FreeCodeCamp Survey exploration</h2>
@@ -41,10 +56,16 @@ class App extends Component {
                 <svg width="800" height="600">
                     <Barchart x="20"
                               y="100"
-                              height="300"
+                              height="500"
                               width="500"
                               data={filteredData}
                               value={(d) => d.which_role} />
+                    <BucketedScatterPlot x="220"
+                                         y="100"
+                                         height="500"
+                                         width="500"
+                                         data={filteredData}
+                                         bucket={(d) => d.which_role} />
                 </svg>
             </div>
         );

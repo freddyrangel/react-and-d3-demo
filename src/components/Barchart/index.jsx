@@ -4,7 +4,7 @@ import d3 from 'd3';
 
 const Bar = ({ x, y, width, height, name }) => (
     <rect x={x} y={y} width={width} height={height}
-          style={{fill: 'steelblue'}}
+          style={{fill: 'steelblue', fillOpacity: .4}}
           title={name} />
 );
 
