@@ -8,6 +8,8 @@ import Filter from './components/Filter';
 import BucketedScatterPlot from './components/BucketedScatterPlot';
 import { TopAxis } from './components/Axis';
 
+require('./style.less');
+
 class App extends Component {
     state = {data: [],
              filter: () => true}
@@ -54,27 +56,27 @@ class App extends Component {
                 <h2>A FreeCodeCamp Survey exploration</h2>
                 <Filter filterByKey="already_working"
                         getFilter={::this.updateFilter}/>
-                <svg width="800" height="600">
+                <svg width="900" height="600">
                     <Barchart x="20"
                               y="100"
                               height="500"
-                              width="700"
+                              width="800"
                               data={filteredData}
                               value={(d) => d.which_role} />
 
                     <BucketedScatterPlot x="220"
                                          y="100"
                                          height="480"
-                                         width={700-220}
+                                         width={800-220}
                                          data={filteredData}
                                          bucket={(d) => d.which_role} />
 
                     <TopAxis data={filteredData}
-                                value={(d) => d.expect_earn}
-                                maxDimension={500}
-                                x={220}
-                                y={95}
-                                className="topAxis" />
+                             value={(d) => d.expect_earn}
+                             maxDimension={800-220}
+                             x={220}
+                             y={95}
+                             className="topAxis" />
                 </svg>
             </div>
         );

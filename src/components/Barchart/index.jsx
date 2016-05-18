@@ -4,8 +4,6 @@ import d3 from 'd3';
 
 import { BottomAxis } from '../Axis';
 
-require('./style.less');
-
 const Bar = ({ x, y, width, height, name }) => (
     <rect x={x} y={y} width={width} height={height}
           style={{fill: 'steelblue', fillOpacity: .4}}
