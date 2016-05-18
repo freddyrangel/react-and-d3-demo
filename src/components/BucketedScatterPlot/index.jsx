@@ -41,7 +41,7 @@ class BucketedScatterPlot extends Component {
                                  width={this.props.width}
                                  height={bucketHeight}
                                  yValue={() => 0}
-                                 xValue={(d) => d.expect_earn}
+                                 xValue={this.props.value}
                                  data={values}
                                  key={`scatterplot-${key}`} />
                  ))}
