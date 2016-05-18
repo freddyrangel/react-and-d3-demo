@@ -6,6 +6,7 @@ import Piechart from './components/Piechart';
 import Barchart from './components/Barchart';
 import Filter from './components/Filter';
 import BucketedScatterPlot from './components/BucketedScatterPlot';
+import { TopAxis } from './components/Axis';
 
 class App extends Component {
     state = {data: [],
@@ -57,15 +58,23 @@ class App extends Component {
                     <Barchart x="20"
                               y="100"
                               height="500"
-                              width="500"
+                              width="700"
                               data={filteredData}
                               value={(d) => d.which_role} />
+
                     <BucketedScatterPlot x="220"
                                          y="100"
-                                         height="500"
-                                         width="500"
+                                         height="480"
+                                         width={700-220}
                                          data={filteredData}
                                          bucket={(d) => d.which_role} />
+
+                    <TopAxis data={filteredData}
+                                value={(d) => d.expect_earn}
+                                maxDimension={500}
+                                x={220}
+                                y={95}
+                                className="topAxis" />
                 </svg>
             </div>
         );

@@ -2,6 +2,10 @@
 import React, { Component } from 'react';
 import d3 from 'd3';
 
+import { BottomAxis } from '../Axis';
+
+require('./style.less');
+
 const Bar = ({ x, y, width, height, name }) => (
     <rect x={x} y={y} width={width} height={height}
           style={{fill: 'steelblue', fillOpacity: .4}}
@@ -25,6 +29,7 @@ const LabeledBar = ({name, x, y, height, labelMargin, ...params}) => {
 
 class Barchart extends Component {
     labelMargin = 200;
+    bottomMargin = 20;
     xScale = d3.scaleLinear();
     yScale = d3.scaleOrdinal();
 
@@ -42,7 +47,7 @@ class Barchart extends Component {
                         .sortKeys(d3.ascending)
                         .entries(newProps.data);
 
-        let barHeight = (newProps.height-(this.counts.length*3))/this.counts.length;
+        let barHeight = (this.drawHeight-(this.counts.length*3))/this.counts.length;
 
         this.xScale
             .domain([0, d3.max(counts,
@@ -54,10 +59,14 @@ class Barchart extends Component {
             .range(d3.range(0, barHeight*counts.length, barHeight+3));
     }
 
+    get drawHeight() {
+        return this.props.height - this.bottomMargin;
+    }
+
     render() {
         let transform = `translate(${this.props.x}, ${this.props.y})`;
 
-        let barHeight = (this.props.height-(this.counts.length*3))/this.counts.length;
+        let barHeight = (this.drawHeight-(this.counts.length*3))/this.counts.length;
 
         return (
             <g transform={transform}>
@@ -70,6 +79,13 @@ class Barchart extends Component {
                                 key={`bar-${key}`}
                                 labelMargin={this.labelMargin}/>
                  ))}
+
+            <BottomAxis data={this.counts}
+                        value={(d) => d.values.length}
+                        maxDimension={this.props.width-this.labelMargin}
+                        x={this.labelMargin}
+                        y={this.props.height-this.bottomMargin+2}
+                        className="bottomAxis"/>
             </g>
         );
     }
