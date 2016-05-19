@@ -33,18 +33,18 @@ class BucketedScatterPlot extends Component {
 
         let bucketHeight = (this.props.height-(this.buckets.length*3))/this.buckets.length;
 
+        // this.yScale(i)+bucketHeight/2
+
         return (
             <g transform={transform}>
-                {this.buckets.map(({key, values}, i) => (
-                    <ScatterPlot x={0}
-                                 y={this.yScale(i)+bucketHeight/2}
-                                 width={this.props.width}
-                                 height={bucketHeight}
-                                 yValue={() => 0}
-                                 xValue={this.props.value}
-                                 data={values}
-                                 key={`scatterplot-${key}`} />
-                 ))}
+                <ScatterPlot x={0}
+                             y={bucketHeight/2}
+                             width={this.props.width}
+                             height={this.props.height - bucketHeight/2}
+                             yValue={(d) => this.yScale(this.props.bucket(d))}
+                             maxY={this.props.height - bucketHeight/2}
+                             xValue={this.props.value}
+                             data={this.props.data} />
             </g>
         );
     }

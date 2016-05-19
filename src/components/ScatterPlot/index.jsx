@@ -2,12 +2,12 @@
 import React from 'react';
 import d3 from 'd3';
 
-const ScatterPlot = ({ x, y, width, height, yValue, xValue, data}) => {
+const ScatterPlot = ({ x, y, width, height, yValue, xValue, maxY, maxX, data}) => {
     let xScale = d3.scaleLinear()
-                   .domain([0, d3.max(data, xValue)])
+                   .domain([0, maxX || d3.max(data, xValue)])
                    .range([0, width]),
         yScale = d3.scaleLinear()
-                   .domain([0, d3.max(data, yValue)])
+                   .domain([0, maxY || d3.max(data, yValue)])
                    .range([0, height]),
         transform = `translate(${x}, ${y})`;
 
