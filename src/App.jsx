@@ -7,6 +7,7 @@ import Barchart from './components/Barchart';
 import Picker from './components/Picker';
 import BucketedScatterPlot from './components/BucketedScatterPlot';
 import { TopAxis } from './components/Axis';
+import _ from 'lodash';
 
 require('./style.less');
 
@@ -20,6 +21,7 @@ class App extends Component {
 
     parseRow(d) {
         return {
+            id: d.NetworkID,
             job_interest: d.JobRoleInterest,
             already_working: Boolean(Number(d.IsSoftwareDev)),
             expect_earn: Number(d.ExpectedEarning),
@@ -43,23 +45,22 @@ class App extends Component {
         d3.csv('https://raw.githubusercontent.com/erictleung/2016-new-coder-survey/clean-and-combine-data/clean-data/2016-FCC-New-Coders-Survey-Data.csv')
           .row((d) => this.fixRow(this.parseRow(d)))
           .get((err, data) => {
-              this.setState({data: data});
+              this.setState({data: _.uniqBy(data, (d) => d.id)
+                                    .filter((d, i) => i < 2500)});
           });
     }
 
     pickQualitative(newKey) {
-        console.log(newKey);
-        debugger;
+        console.log("pickQual", Number(new Date()));
         this.setState({bucketKey: newKey});
     }
 
     pickQuantitative(newKey) {
+        console.log("pickQuan", Number(new Date()));
         this.setState({distroKey: newKey});
     }
 
     render() {
-        let filteredData = this.state.data.filter((d) => d[this.state.distroKey]);
-
         return (
             <div className="container">
                 <h2>FreeCodeCamp Survey correlation explorer</h2>
@@ -83,18 +84,18 @@ class App extends Component {
                               y="100"
                               height="500"
                               width="800"
-                              data={filteredData}
+                              data={this.state.data}
                               value={(d) => d[this.state.bucketKey]} />
 
                     <BucketedScatterPlot x="220"
                                          y="100"
                                          height="480"
                                          width={800-220}
-                                         data={filteredData}
+                                         data={this.state.data}
                                          bucket={(d) => d[this.state.bucketKey]}
                                          value={(d) => d[this.state.distroKey]} />
 
-                    <TopAxis data={filteredData}
+                    <TopAxis data={this.state.data}
                              value={(d) => d[this.state.distroKey]}
                              maxDimension={800-220}
                              x={220}

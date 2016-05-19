@@ -31,9 +31,11 @@ class BucketedScatterPlot extends Component {
     render() {
         let transform = `translate(${this.props.x}, ${this.props.y})`;
 
-        let bucketHeight = (this.props.height-(this.buckets.length*3))/this.buckets.length;
+        if (this.props.data.length < 1) {
+            return null;
+        }
 
-        // this.yScale(i)+bucketHeight/2
+        let bucketHeight = (this.props.height-(this.buckets.length*3))/this.buckets.length;
 
         return (
             <g transform={transform}>
