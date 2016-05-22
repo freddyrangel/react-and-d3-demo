@@ -8,19 +8,37 @@ import _ from 'lodash';
 class PlotDot extends Component {
 
     componentWillMount() {
+        this._isMounted = true;
         this.setState({x: this.props.x,
                        y: this.props.y});
     }
 
-    componentWillReceiveProps(nextProps) {
-        if (this.state.x != nextProps.x || this.state.y != nextProps.y) {
-            let node = d3.select(ReactDOM.findDOMNode(this));
+    componentWillUnmount() {
+        this._isMounted = false;
+        this.cancelTransitions();
+    }
 
-            node.transition(this.props.transition)
-                .attr('cx', nextProps.x)
-                .attr('cy', nextProps.y)
-                .on('end', () => this.setState({x: nextProps.x, y: nextProps.y}));
+    componentWillReceiveProps(nextProps) {
+        if (this._isMounted) {
+            if (this.state.x != nextProps.x || this.state.y != nextProps.y) {
+                let node = d3.select(ReactDOM.findDOMNode(this));
+
+                node.transition(this.props.transition)
+                    .attr('cx', nextProps.x)
+                    .attr('cy', nextProps.y)
+                    .on('end', () => {
+                        this.setState({x: nextProps.x,
+                                       y: nextProps.y})
+                    });
+            }
+        }else{
+            this.cancelTransitions();
         }
+    }
+
+    cancelTransitions() {
+        let node = d3.select(ReactDOM.findDOMNode(this));
+        node.interrupt();
     }
 
     render() {
@@ -33,36 +51,73 @@ class PlotDot extends Component {
     }
 }
 
-const ScatterPlot = ({ x, y, width, height, yValue, xValue, maxY, maxX, data}) => {
-    let xScale = d3.scaleLinear()
-                   .domain([0, maxX || d3.max(data, xValue)])
-                   .range([0, width]),
-        yScale = d3.scaleLinear()
-                   .domain([0, maxY || d3.max(data, yValue)])
-                   .range([0, height]),
-        transform = `translate(${x}, ${y})`,
-        transition = d3.transition()
-                       .duration(3000);
+class ScatterPlot extends Component {
+    data = {data: []};
+    xScale = d3.scaleLinear();
+    yScale = d3.scaleLinear();
 
-    console.log("rendering dots", Number(new Date()));
+    componentWillMount() {
+        this.updateD3(this.props);
+    }
 
-    return (
-        <g transform={transform}>
-        {data.map((d, i) => {
-            let x = xValue(d),
-                y = yValue(d);
+    componentWillReceiveProps(newProps) {
+        this.updateD3(newProps);
+    }
 
-            if (!_.isNaN(x) && !_.isNaN(y)) {
-                return (<PlotDot x={xScale(xValue(d))}
-                                 y={yScale(yValue(d))}
-                                 transition={transition}
-                                 key={`point-${d.id}`} />)
-            }else{
-                return null;
-            }
-        })}
-        </g>
-    );
-};
+    updateD3(props) {
+        let xScale = this.xScale
+            .domain([0, props.maxX || d3.max(props.data, props.xValue)])
+            .range([0, props.width]);
+
+        let yScale = this.yScale
+            .domain([0, props.maxY || d3.max(props.data, props.yValue)])
+            .range([0, props.height]);
+
+        let xs = {},
+            ys = {};
+
+        console.log("pre clean", props.data.length);
+
+        let data = this.props.data.map((d) => {
+            d.x = Math.round(xScale(props.xValue(d)));
+            d.y = Math.round(yScale(props.yValue(d)));
+            return d;
+        }).filter((d) => !_.isNaN(d.x) && !_.isNaN(d.y))
+          .filter((d) => {
+            xs[d.x] = xs[d.x] ? xs[d.x]+1 : 1;
+            ys[d.y] = ys[d.y] ? ys[d.y]+1 : 1;
+
+            // !true if both taken
+            // !false if still room
+            return !(xs[d.x] > 10 && ys[d.y] > 10);
+        });
+
+        console.log(xs);
+
+        console.log("post clean", data.length);
+
+        this.setState({data: data});
+    }
+
+    render() {
+        let { x, y, yValue, xValue } = this.props,
+            data = this.state.data;
+
+        let transform = `translate(${x}, ${y})`,
+            transition = d3.transition()
+                           .duration(5000);
+
+        return (
+            <g transform={transform}>
+                    {data.map((d, i) => (
+                        <PlotDot x={d.x}
+                        y={d.y}
+                        transition={transition}
+                        key={`point-${d.id}`} />
+                     ))}
+            </g>
+        );
+    }
+}
 
 export default ScatterPlot;

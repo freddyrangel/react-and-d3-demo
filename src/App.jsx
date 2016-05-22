@@ -45,8 +45,7 @@ class App extends Component {
         d3.csv('https://raw.githubusercontent.com/erictleung/2016-new-coder-survey/clean-and-combine-data/clean-data/2016-FCC-New-Coders-Survey-Data.csv')
           .row((d) => this.fixRow(this.parseRow(d)))
           .get((err, data) => {
-              this.setState({data: _.uniqBy(data, (d) => d.id)
-                                    .filter((d, i) => i < 2500)});
+              this.setState({data: _.uniqBy(data, (d) => d.id)});
           });
     }
 
