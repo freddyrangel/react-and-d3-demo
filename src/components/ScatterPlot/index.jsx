@@ -73,10 +73,11 @@ class ScatterPlot extends Component {
             .domain([0, props.maxY || d3.max(props.data, props.yValue)])
             .range([0, props.height]);
 
-        let xs = {},
-            ys = {};
-
-        console.log("pre clean", props.data.length);
+        let occupied = new Array(props.width+1);
+        d3.range(props.width+1)
+          .forEach((i) => {
+              occupied[i] = new Array(props.height+1).fill(0)
+          });
 
         let data = this.props.data.map((d) => {
             d.x = Math.round(xScale(props.xValue(d)));
@@ -84,15 +85,10 @@ class ScatterPlot extends Component {
             return d;
         }).filter((d) => !_.isNaN(d.x) && !_.isNaN(d.y))
           .filter((d) => {
-            xs[d.x] = xs[d.x] ? xs[d.x]+1 : 1;
-            ys[d.y] = ys[d.y] ? ys[d.y]+1 : 1;
+              occupied[d.x][d.y] += 1;
 
-            // !true if both taken
-            // !false if still room
-            return !(xs[d.x] > 10 && ys[d.y] > 10);
+              return !(occupied[d.x][d.y] > 10);
         });
-
-        console.log(xs);
 
         console.log("post clean", data.length);
 

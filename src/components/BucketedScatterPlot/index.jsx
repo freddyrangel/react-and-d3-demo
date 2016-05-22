@@ -42,7 +42,7 @@ class BucketedScatterPlot extends Component {
                 <ScatterPlot x={0}
                              y={bucketHeight/2}
                              width={this.props.width}
-                             height={this.props.height - bucketHeight/2}
+                             height={Math.round(this.props.height - bucketHeight/2)}
                              yValue={(d) => this.yScale(this.props.bucket(d))}
                              maxY={this.props.height - bucketHeight/2}
                              xValue={this.props.value}
