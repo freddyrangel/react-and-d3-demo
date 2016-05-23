@@ -46,6 +46,7 @@
     "eslint-plugin-react": "^3.11.3",
     "eventsource-polyfill": "^0.9.6",
     "express": "^4.13.3",
+    "less": "^2.7.1",
     "less-loader": "^2.2.2",
     "rimraf": "^2.4.3",
     "style-loader": "^0.13.0",
