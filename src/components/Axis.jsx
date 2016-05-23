@@ -1,52 +1,40 @@
-
 import React, { Component } from 'react';
-import ReactDOM from 'react-dom';
-import d3 from 'd3';
+import { findDOMNode }      from 'react-dom';
+import d3                   from 'd3';
 
 class Axis extends Component {
 
     constructor(props) {
-        super();
-
-        this.scale = d3.scaleLinear();
-        this.axis = d3.axisBottom(this.scale);
-
+        super(props);
+        this.scale  = d3.scaleLinear();
+        this.axis   = d3.axisBottom(this.scale);
         this.updateD3(props);
     }
 
-    componentWillReceiveProps(newProps) {
-        this.updateD3(newProps);
-    }
+    componentDidUpdate()                { this.renderAxis(); }
+    componentDidMount()                 { this.renderAxis(); }
+    componentWillReceiveProps(newProps) { this.updateD3(newProps); }
 
     updateD3(props) {
+        let {data, value, maxDimension, tickFormat} = props
         this.scale
-            .domain([0,
-                     d3.max(props.data, props.value)])
-            .range([0, props.maxDimension]);
+            .domain([0, d3.max(data, value)])
+            .range([0, maxDimension]);
 
         // should prob be handled with default props instead
-        let tickFormat = (d) => this.scale.tickFormat()(d);
-        if (props.tickFormat) {
-            tickFormat = props.tickFormat;
-        }
-
+        if (!!tickFormat) tickFormat = (d) => this.scale.tickFormat()(d);
         this.axis.tickFormat(tickFormat)
     }
 
-    componentDidUpdate() { this.renderAxis(); }
-    componentDidMount() { this.renderAxis(); }
-
     renderAxis() {
-        let node = ReactDOM.findDOMNode(this);
-
+        let node = findDOMNode(this);
         d3.select(node).call(this.axis);
     }
 
     render() {
         let translate = `translate(${this.props.x}, ${this.props.y})`;
         return (
-            <g className={`axis ${this.props.className}`} transform={translate}>
-            </g>
+            <g className={`axis ${this.props.className}`} transform={translate} />
         );
     }
 }
@@ -54,9 +42,7 @@ class Axis extends Component {
 class BottomAxis extends Axis {
     constructor(props) {
         super(props);
-
         this.axis = d3.axisBottom(this.scale);
-
         super.updateD3(props);
     }
 }
@@ -64,9 +50,7 @@ class BottomAxis extends Axis {
 class TopAxis extends Axis {
     constructor(props) {
         super(props);
-
         this.axis = d3.axisTop(this.scale);
-
         super.updateD3(props);
     }
 }

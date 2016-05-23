@@ -1,52 +1,51 @@
-
+import './style.less';
 import React, { Component } from 'react';
-import d3 from 'd3';
+import d3                   from 'd3';
+import _                    from 'lodash';
+import Piechart             from 'components/Piechart';
+import Barchart             from 'components/Barchart';
+import Picker               from 'components/Picker';
+import BucketedScatterPlot  from 'components/BucketedScatterPlot';
+import { TopAxis }          from 'components/Axis';
 
-import Piechart from './components/Piechart';
-import Barchart from './components/Barchart';
-import Picker from './components/Picker';
-import BucketedScatterPlot from './components/BucketedScatterPlot';
-import { TopAxis } from './components/Axis';
-import _ from 'lodash';
+const parseRow = (d) => {
+    return {
+        id              : d.NetworkID,
+        job_interest    : d.JobRoleInterest,
+        already_working : Boolean(Number(d.IsSoftwareDev)),
+        expect_earn     : Number(d.ExpectedEarning),
+        age             : Number(d.Age),
+        hours_learning  : Number(d.HoursLearning),
+        income          : Number(d.Income),
+        job_preference  : d.JobPref,
+        job_where       : d.JobWherePref
+    };
+};
 
-require('./style.less');
+const fixRow = (d) => {
+    if (d.expect_earn < 10000) d.expect_earn *= 12;
+    return d;
+};
 
 class App extends Component {
-    state = {data: [],
-             bucketKey: 'job_interest',
-             distroKey: 'income'}
+
+    state = {
+        data      : [],
+        bucketKey : 'job_interest',
+        distroKey : 'income'
+    };
 
     qualitative_options = ['job_interest', 'already_working', 'job_preference', 'job_where'];
+
     quantitative_options = ['expect_earn', 'age', 'hours_learning', 'income'];
 
-    parseRow(d) {
-        return {
-            id: d.NetworkID,
-            job_interest: d.JobRoleInterest,
-            already_working: Boolean(Number(d.IsSoftwareDev)),
-            expect_earn: Number(d.ExpectedEarning),
-            age: Number(d.Age),
-            hours_learning: Number(d.HoursLearning),
-            income: Number(d.Income),
-            job_preference: d.JobPref,
-            job_where: d.JobWherePref
-        };
-    }
-
-    fixRow(d) {
-        if (d.expect_earn < 10000) {
-            d.expect_earn *= 12;
-        }
-
-        return d;
-    }
 
     componentWillMount() {
-        d3.csv('https://raw.githubusercontent.com/erictleung/2016-new-coder-survey/clean-and-combine-data/clean-data/2016-FCC-New-Coders-Survey-Data.csv')
-          .row((d) => this.fixRow(this.parseRow(d)))
-          .get((err, data) => {
-              this.setState({data: _.uniqBy(data, (d) => d.id)});
-          });
+        d3.csv('./2016-FCC-New-Coders-Survey-Data.csv')
+            .row((d) => fixRow(parseRow(d)))
+            .get((err, data) => {
+                this.setState({data: _.uniqBy(data, (d) => d.id)});
+            });
     }
 
     pickQualitative(newKey) {

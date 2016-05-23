@@ -1,8 +1,6 @@
-
 import React, { Component } from 'react';
-import d3 from 'd3';
-
-import { BottomAxis } from '../Axis';
+import d3                   from 'd3';
+import { BottomAxis }       from '../Axis';
 
 const Bar = ({ x, y, width, height, name }) => (
     <rect x={x} y={y} width={width} height={height}

@@ -1,8 +1,6 @@
-
 import React, { Component } from 'react';
-import d3 from 'd3';
-
-import ScatterPlot from '../ScatterPlot';
+import d3                   from 'd3';
+import ScatterPlot          from '../ScatterPlot';
 
 class BucketedScatterPlot extends Component {
     yScale = d3.scaleOrdinal();

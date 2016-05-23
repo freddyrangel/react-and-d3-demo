@@ -1,9 +1,8 @@
-
 import React, { Component } from 'react';
 import ReactTransitionGroup from 'react-addons-transition-group';
-import ReactDOM from 'react-dom';
-import d3 from 'd3';
-import _ from 'lodash';
+import { findDOMNode }      from 'react-dom';
+import d3                   from 'd3';
+import _                    from 'lodash';
 
 class PlotDot extends Component {
 
@@ -21,7 +20,7 @@ class PlotDot extends Component {
     componentWillReceiveProps(nextProps) {
         if (this._isMounted) {
             if (this.state.x != nextProps.x || this.state.y != nextProps.y) {
-                let node = d3.select(ReactDOM.findDOMNode(this));
+                let node = d3.select(findDOMNode(this));
 
                 node.transition(this.props.transition)
                     .attr('cx', nextProps.x)
@@ -31,13 +30,13 @@ class PlotDot extends Component {
                                        y: nextProps.y})
                     });
             }
-        }else{
+        } else {
             this.cancelTransitions();
         }
     }
 
     cancelTransitions() {
-        let node = d3.select(ReactDOM.findDOMNode(this));
+        let node = d3.select(findDOMNode(this));
         node.interrupt();
     }
 
