@@ -44,7 +44,7 @@ class PlotDot extends Component {
         return (
             <circle cx={this.state.x}
                     cy={this.state.y}
-                    r="3"
+                    r={this.props.r}
                     style={{fillOpacity: .1, strokeOpacity: .3}} />
         );
     }
@@ -52,8 +52,9 @@ class PlotDot extends Component {
 
 class ScatterPlot extends Component {
     data = {data: []};
-    xScale = d3.scaleLinear();
-    yScale = d3.scaleLinear();
+    xScale = d3.scaleQuantize();
+    yScale = d3.scaleQuantize();
+    precision = 1;
 
     componentWillMount() {
         this.updateD3(this.props);
@@ -64,37 +65,40 @@ class ScatterPlot extends Component {
     }
 
     updateD3(props) {
+        let precision = props.precision || this.precision;
+
         let xScale = this.xScale
             .domain([0, props.maxX || d3.max(props.data, props.xValue)])
-            .range([0, props.width]);
+            .range(d3.range(0, props.width, precision));
 
         let yScale = this.yScale
             .domain([0, props.maxY || d3.max(props.data, props.yValue)])
-            .range([0, props.height]);
+                         .range(d3.range(0, props.height, precision));
 
-        let occupied = new Array(props.width+1);
-        d3.range(props.width+1)
+        let occupied = new Array(props.width+precision);
+        d3.range(props.width+precision)
           .forEach((i) => {
-              occupied[i] = new Array(props.height+1).fill(0)
+              occupied[i] = new Array(props.height+precision).fill(0)
           });
 
         let data = props.data.map((d) => {
-            d.x = Math.round(xScale(props.xValue(d)));
-            d.y = Math.round(yScale(props.yValue(d)));
+            d.x = xScale(props.xValue(d));
+            d.y = yScale(props.yValue(d));
             return d;
-        }).filter((d) => !_.isNaN(d.x) && !_.isNaN(d.y))
+        }).filter((d) => !_.isNaN(d.x) && !_.isNaN(d.y) && !_.isUndefined(d.x) && !_.isUndefined(d.y))
           .filter((d) => {
               occupied[d.x][d.y] += 1;
 
               return !(occupied[d.x][d.y] > 10);
-        });
+          });
 
         this.setState({data: data});
     }
 
     render() {
         let { x, y, yValue, xValue } = this.props,
-            data = this.state.data;
+            data = this.state.data,
+            precision = this.props.precision || this.precision;
 
         let transform = `translate(${x}, ${y})`,
             transition = d3.transition()
@@ -107,6 +111,7 @@ class ScatterPlot extends Component {
                     {data.map((d, i) => (
                         <PlotDot x={d.x}
                         y={d.y}
+                        r={3+precision/3}
                         transition={transition}
                         key={`point-${d.id}`} />
                      ))}

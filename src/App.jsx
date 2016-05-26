@@ -44,7 +44,7 @@ const QualitativeChart = ({ xKey, yKey, data }) => (
 
         <BucketedScatterPlot x="220"
                              y="100"
-                             height="480"
+                             height={480}
                              width={800-220}
                              data={data}
                              bucket={(d) => d[yKey]}
@@ -63,11 +63,12 @@ const QuantitativeChart = ({ xKey, yKey, data }) => (
     <g>
         <ScatterPlot x="220"
                      y="100"
-                     height="480"
+                     height={480}
                      width={800-220}
                      data={data}
                      yValue={(d) => d[yKey]}
-                     xValue={(d) => d[xKey]} />
+                     xValue={(d) => d[xKey]}
+                     precision={8} />
 
         <TopAxis data={data}
                  value={(d) => d[xKey]}
