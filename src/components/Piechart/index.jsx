@@ -1,15 +1,11 @@
-
 import React, { Component } from 'react';
-import d3 from 'd3';
-
-import { LabeledArc } from './Arc';
+import d3                   from 'd3';
+import { LabeledArc }       from './Arc';
 
 class Piechart extends Component {
-    constructor() {
-        super();
-
-        this.pie = d3.pie()
-                     .value((d) => d.value);
+    constructor(props) {
+        super(props);
+        this.pie = d3.pie().value((d) => d.value);
     }
 
     arcGenerator(d, i) {

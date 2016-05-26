@@ -1,5 +1,6 @@
 var path = require('path');
 var webpack = require('webpack');
+var cwd = process.cwd();
 
 module.exports = {
   devtool: 'cheap-module-eval-source-map',
@@ -17,10 +18,11 @@ module.exports = {
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoErrorsPlugin()
   ],
-  // require('./code') vs. require('./code.jsx');
-  // import foo from './code';
   resolve: {
-      extensions: ['', '.js', '.jsx']
+  },
+  resolve: {
+      modulesDirectories: [cwd + '/src', 'node_modules'],
+      extensions: ['', '.json', '.jsx', '.js'],
   },
   module: {
     loaders: [{
@@ -32,7 +34,5 @@ module.exports = {
         test: /\.less$/,
         loader: "style!css!less"
     }]
-      // require('style.less')
-      // --> <link ...
   }
 };

@@ -1,6 +1,5 @@
-
 import React, { Component } from 'react';
-import d3 from 'd3';
+import d3                   from 'd3';
 
 let colors = d3.scaleCategory10();
 

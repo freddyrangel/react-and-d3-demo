@@ -1,4 +1,3 @@
-
 import React, { Component } from 'react';
 
 const Toggle = ({ name, label, value, tellValue }) => {
