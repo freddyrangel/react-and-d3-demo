@@ -78,7 +78,7 @@ class ScatterPlot extends Component {
               occupied[i] = new Array(props.height+1).fill(0)
           });
 
-        let data = this.props.data.map((d) => {
+        let data = props.data.map((d) => {
             d.x = Math.round(xScale(props.xValue(d)));
             d.y = Math.round(yScale(props.yValue(d)));
             return d;
@@ -88,8 +88,6 @@ class ScatterPlot extends Component {
 
               return !(occupied[d.x][d.y] > 10);
         });
-
-        console.log("post clean", data.length);
 
         this.setState({data: data});
     }

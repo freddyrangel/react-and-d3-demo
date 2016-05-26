@@ -6,19 +6,25 @@ import Piechart             from 'components/Piechart';
 import Barchart             from 'components/Barchart';
 import Picker               from 'components/Picker';
 import BucketedScatterPlot  from 'components/BucketedScatterPlot';
+import ScatterPlot          from 'components/ScatterPlot';
 import { TopAxis }          from 'components/Axis';
 
 const parseRow = (d) => {
     return {
         id              : d.NetworkID,
-        job_interest    : d.JobRoleInterest,
-        already_working : Boolean(Number(d.IsSoftwareDev)),
-        expect_earn     : Number(d.ExpectedEarning),
+        jobRoleInterest    : d.JobRoleInterest,
+        alreadyWorking : Boolean(Number(d.IsSoftwareDev)),
+        expectedEarning     : Number(d.ExpectedEarning),
         age             : Number(d.Age),
-        hours_learning  : Number(d.HoursLearning),
+        hoursLearning  : Number(d.HoursLearning),
+        monthsProgramming : Number(d.MonthsProgramming),
+        moneyForLearning : Number(d.MoneyForLearning),
+        commuteTime : Number(d.CommuteTime),
         income          : Number(d.Income),
-        job_preference  : d.JobPref,
-        job_where       : d.JobWherePref
+        jobPref  : d.JobPref,
+        jobWherePref       : d.JobWherePref,
+        jobRelocate : Boolean(Number(d.JobRelocate)),
+        jobApplyWhen : Number(d.JobApplyWhen)
     };
 };
 
@@ -31,13 +37,13 @@ class App extends Component {
 
     state = {
         data      : [],
-        bucketKey : 'job_interest',
+        bucketKey : 'jobRoleInterest',
         distroKey : 'income'
     };
 
-    qualitative_options = ['job_interest', 'already_working', 'job_preference', 'job_where'];
+    qualitative_options = ['jobRoleInterest', 'alreadyWorking', 'jobPref', 'jobWherePref', 'jobRelocate'];
 
-    quantitative_options = ['expect_earn', 'age', 'hours_learning', 'income'];
+    quantitative_options = ['expectedEarning', 'age', 'hoursLearning', 'monthsProgramming', 'moneyForLearning', 'commuteTime', 'income'];
 
 
     componentWillMount() {
@@ -49,12 +55,10 @@ class App extends Component {
     }
 
     pickQualitative(newKey) {
-        console.log("pickQual", Number(new Date()));
         this.setState({bucketKey: newKey});
     }
 
     pickQuantitative(newKey) {
-        console.log("pickQuan", Number(new Date()));
         this.setState({distroKey: newKey});
     }
 
