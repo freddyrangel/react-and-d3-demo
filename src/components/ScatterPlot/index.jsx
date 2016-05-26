@@ -100,6 +100,8 @@ class ScatterPlot extends Component {
             transition = d3.transition()
                            .duration(5000);
 
+        console.log(`Drawing ${data.length} datapoints`);
+
         return (
             <g transform={transform}>
                     {data.map((d, i) => (

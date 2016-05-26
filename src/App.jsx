@@ -7,7 +7,7 @@ import Barchart             from 'components/Barchart';
 import Picker               from 'components/Picker';
 import BucketedScatterPlot  from 'components/BucketedScatterPlot';
 import ScatterPlot          from 'components/ScatterPlot';
-import { TopAxis }          from 'components/Axis';
+import { TopAxis, LeftAxis }from 'components/Axis';
 
 const parseRow = (d) => {
     return {
@@ -33,17 +33,69 @@ const fixRow = (d) => {
     return d;
 };
 
+const QualitativeChart = ({ xKey, yKey, data }) => (
+    <g>
+        <Barchart x="20"
+                  y="100"
+                  height="500"
+                  width="800"
+                  data={data}
+                  value={(d) => d[yKey]} />
+
+        <BucketedScatterPlot x="220"
+                             y="100"
+                             height="480"
+                             width={800-220}
+                             data={data}
+                             bucket={(d) => d[yKey]}
+                             value={(d) => d[xKey]} />
+
+        <TopAxis data={data}
+                 value={(d) => d[xKey]}
+                 maxDimension={800-220}
+                 x={220}
+                 y={95}
+                 className="topAxis" />
+    </g>
+);
+
+const QuantitativeChart = ({ xKey, yKey, data }) => (
+    <g>
+        <ScatterPlot x="220"
+                     y="100"
+                     height="480"
+                     width={800-220}
+                     data={data}
+                     yValue={(d) => d[yKey]}
+                     xValue={(d) => d[xKey]} />
+
+        <TopAxis data={data}
+                 value={(d) => d[xKey]}
+                 maxDimension={800-220}
+                 x={220}
+                 y={95}
+                 className="topAxis" />
+
+        <LeftAxis data={data}
+                  value={(d) => d[yKey]}
+                  maxDimension={480}
+                  x={220}
+                  y={100}
+                  className="leftAxis" />
+    </g>
+);
+
 class App extends Component {
 
     state = {
         data      : [],
-        bucketKey : 'jobRoleInterest',
-        distroKey : 'income'
+        yKey : 'jobRoleInterest',
+        xKey : 'income'
     };
 
-    qualitative_options = ['jobRoleInterest', 'alreadyWorking', 'jobPref', 'jobWherePref', 'jobRelocate'];
+    qualitativeOptions = ['jobRoleInterest', 'alreadyWorking', 'jobPref', 'jobWherePref', 'jobRelocate'];
 
-    quantitative_options = ['expectedEarning', 'age', 'hoursLearning', 'monthsProgramming', 'moneyForLearning', 'commuteTime', 'income'];
+    quantitativeOptions = ['expectedEarning', 'age', 'hoursLearning', 'monthsProgramming', 'moneyForLearning', 'commuteTime', 'income'];
 
 
     componentWillMount() {
@@ -54,55 +106,49 @@ class App extends Component {
             });
     }
 
-    pickQualitative(newKey) {
-        this.setState({bucketKey: newKey});
+    pickY(newKey) {
+        this.setState({yKey: newKey});
     }
 
-    pickQuantitative(newKey) {
-        this.setState({distroKey: newKey});
+    pickX(newKey) {
+        this.setState({xKey: newKey});
     }
 
     render() {
+        let { xKey, yKey, data } = this.state,
+            chart;
+
+        if (this.qualitativeOptions.includes(yKey)) {
+            chart = <QualitativeChart xKey={xKey}
+                                      yKey={yKey}
+                                      data={data} />
+        }else{
+            chart = <QuantitativeChart xKey={xKey}
+                                       yKey={yKey}
+                                       data={data} />
+        }
+
+
         return (
             <div className="container">
                 <h2>FreeCodeCamp Survey correlation explorer</h2>
 
                 <div>
-                    Choose qualitative axis
-                    <Picker options={this.qualitative_options}
-                            onPick={::this.pickQualitative}
-                            picked={this.state.bucketKey} />
+                    Choose X axis
+                    <Picker options={this.quantitativeOptions}
+                            onPick={::this.pickX}
+                            picked={this.state.xKey} />
                 </div>
 
                 <div>
-                    Choose quantitative axis
-                    <Picker options={this.quantitative_options}
-                            onPick={::this.pickQuantitative}
-                            picked={this.state.distroKey} />
+                    Choose Y axis
+                    <Picker options={this.quantitativeOptions.concat(this.qualitativeOptions)}
+                            onPick={::this.pickY}
+                            picked={this.state.yKey} />
                 </div>
 
                 <svg width="900" height="600">
-                    <Barchart x="20"
-                              y="100"
-                              height="500"
-                              width="800"
-                              data={this.state.data}
-                              value={(d) => d[this.state.bucketKey]} />
-
-                    <BucketedScatterPlot x="220"
-                                         y="100"
-                                         height="480"
-                                         width={800-220}
-                                         data={this.state.data}
-                                         bucket={(d) => d[this.state.bucketKey]}
-                                         value={(d) => d[this.state.distroKey]} />
-
-                    <TopAxis data={this.state.data}
-                             value={(d) => d[this.state.distroKey]}
-                             maxDimension={800-220}
-                             x={220}
-                             y={95}
-                             className="topAxis" />
+                    {chart}
                 </svg>
             </div>
         );

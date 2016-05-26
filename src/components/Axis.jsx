@@ -55,5 +55,13 @@ class TopAxis extends Axis {
     }
 }
 
+class LeftAxis extends Axis {
+    constructor(props) {
+        super(props);
+        this.axis = d3.axisLeft(this.scale);
+        super.updateD3(props);
+    }
+}
+
 export default Axis;
-export { BottomAxis, TopAxis };
+export { BottomAxis, TopAxis, LeftAxis };
