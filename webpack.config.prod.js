@@ -1,9 +1,13 @@
-var path = require('path');
-var webpack = require('webpack');
+const path = require('path');
+const webpack = require('webpack');
+
+//const isUnfinished = 
+
+console.log('this is the unifished env constiable', process.env.UNFINISHED);
 
 module.exports = {
   entry: [
-    './src/index'
+    './finished/index'
   ],
   output: {
     path: path.join(__dirname, 'static'),
@@ -26,7 +30,7 @@ module.exports = {
     loaders: [{
       test: /\.js|\.jsx$/,
       loaders: ['babel'],
-      include: path.join(__dirname, 'src')
+      include: path.join(__dirname, 'finished')
     },
     {
       test: /\.js|\.jsx?/,
