@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import d3                   from 'd3';
 import _                    from 'lodash';
 
+import Barchart             from './components/Barchart';
+
 const parseRow = (d) => {
   return {
     id                : d.NetworkID,
@@ -48,22 +50,26 @@ export default class App extends Component {
   }
 
   render() {
-    const { data } = this.state;
+      const { data } = this.state;
 
-    if (data.length === 0) {
-      return <h1>Loading...</h1>
-    } else {
-      const columns = Object.keys(data[0]);
-      return <table className="table">
-        <thead>
-          <tr>
-            { columns.map((column, i) => <th key={i}>{column}</th>) }
-          </tr>
-        </thead>
-        <tbody>
-          { this.renderRows(data, columns) }
-        </tbody>
-      </table>
-    }
+      if (data.length === 0) {
+          return (<h1>Loading...</h1>)
+      } else {
+
+          return (
+              <div className="container">
+                  <svg width="900" height="600">
+                      <g>
+                          <Barchart x="20"
+                                    y="100"
+                                    height="500"
+                                    width="800"
+                                    data={data}
+                                    value={(d) => d['jobPref']} />
+                      </g>
+                  </svg>
+              </div>
+          )
+      }
   }
 }
