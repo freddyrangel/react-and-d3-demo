@@ -3,6 +3,7 @@ import d3                   from 'd3';
 import _                    from 'lodash';
 
 import Barchart             from './components/Barchart';
+import { BucketedScatterPlot } from './components/ScatterPlot';
 
 const parseRow = (d) => {
   return {
@@ -66,6 +67,14 @@ export default class App extends Component {
                                     width="800"
                                     data={data}
                                     value={(d) => d['jobPref']} />
+
+                          <BucketedScatterPlot x="225"
+                                               y="100"
+                                               height={480}
+                                               width={800-220}
+                                               data={data}
+                                               bucket={(d) => d['jobPref']}
+                                               value={(d) => d['income']} />
                       </g>
                   </svg>
               </div>
