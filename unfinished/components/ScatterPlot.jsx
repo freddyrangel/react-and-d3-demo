@@ -5,8 +5,9 @@ import d3                   from 'd3';
 import _                    from 'lodash';
 
 class ScatterPlot extends Component {
-    xScale = d3.scaleLinear();
-    yScale = d3.scaleLinear();
+    xScale = d3.scaleQuantize();
+    yScale = d3.scaleQuantize();
+    precision = 3;
 
     componentWillMount() {
         this.updateD3(this.props);
@@ -21,25 +22,48 @@ class ScatterPlot extends Component {
 
         let xScale = this.xScale
                          .domain([0, maxX || d3.max(data, xValue)])
-                         .range([0, width]);
+                         .range(d3.range(0, props.width, this.precision));
 
         let yScale = this.yScale
                          .domain([0, maxY || d3.max(data, yValue)])
-                         .range([0, height]);
+                         .range(d3.range(0, props.height, this.precision));
     }
 
-    render() {
-        let { x, y, yValue, xValue } = this.props,
-            data = this.props.data;
+    isValidPos(d) {
+        return !(_.isNaN(d.x) || _.isNaN(d.y) || _.isUndefined(d.x) || _.isUndefined(d.y))
+    }
 
-        let transform = `translate(${x}, ${y})`;
+    get reducedData() {
+        let { width, height, data, xValue, yValue } = this.props;
 
-        data = data.map((d) => {
+        width = Number(width);
+        height = Number(height);
+
+        let occupied = new Array(width+this.precision);
+
+        d3.range(width+this.precision)
+          .forEach((i) => {
+              occupied[i] = new Array(height+this.precision).fill(0)
+          });
+
+        return data.map((d) => {
             d.x = this.xScale(xValue(d));
             d.y = this.yScale(yValue(d));
             return d;
         })
-                   .filter((d) => !(_.isNaN(d.x) || _.isNaN(d.y)));
+                   .filter(this.isValidPos)
+                   .filter((d) => {
+                       occupied[d.x][d.y] += 1;
+
+                       return !(occupied[d.x][d.y] > 10);
+                   });
+    }
+
+    render() {
+        let { x, y, yValue, xValue } = this.props;
+
+        let transform = `translate(${x}, ${y})`,
+            data = this.reducedData;
 
         return (
             <g transform={transform}>
