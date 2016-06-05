@@ -4,6 +4,7 @@ import _                    from 'lodash';
 
 import Barchart             from './components/Barchart';
 import { BucketedScatterPlot } from './components/ScatterPlot';
+import { TopAxis, BottomAxis } from 'components/Axis';
 
 const parseRow = (d) => {
   return {
@@ -57,6 +58,11 @@ export default class App extends Component {
           return (<h1>Loading...</h1>)
       } else {
 
+          let bucketedData = d3.nest()
+                               .key((d) => d['jobPref'])
+                               .sortKeys(d3.ascending)
+                               .entries(data);
+
           return (
               <div className="container">
                   <svg width="900" height="600">
@@ -65,16 +71,31 @@ export default class App extends Component {
                                     y="100"
                                     height="500"
                                     width="800"
-                                    data={data}
+                                    bucketedData={bucketedData}
                                     value={(d) => d['jobPref']} />
 
                           <BucketedScatterPlot x="225"
                                                y="100"
                                                height={480}
                                                width={800-220}
+                                               bucketedData={bucketedData}
                                                data={data}
                                                bucket={(d) => d['jobPref']}
                                                value={(d) => d['income']} />
+
+                          <TopAxis data={data}
+                                   value={(d) => d['income']}
+                                   maxDimension={800-220}
+                                   x={240}
+                                   y={95}
+                                   className="topAxis" />
+
+                          <BottomAxis data={bucketedData}
+                                      value={(d) => d.values.length}
+                                      maxDimension={800-220}
+                                      x={240}
+                                      y={580}
+                                      className="bottomAxis"/>
                       </g>
                   </svg>
               </div>

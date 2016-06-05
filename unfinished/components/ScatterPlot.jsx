@@ -84,7 +84,7 @@ class BucketedScatterPlot extends Component {
     yScale = d3.scaleOrdinal();
 
     get barHeight() {
-        let N_buckets = this.buckets.length;
+        let N_buckets = this.props.bucketedData.length;
 
         return (this.props.height - N_buckets*3)/N_buckets;
     }
@@ -98,10 +98,7 @@ class BucketedScatterPlot extends Component {
     }
 
     updateD3(newProps) {
-        let buckets = this.buckets = d3.nest()
-                                       .key(newProps.bucket)
-                                       .sortKeys(d3.ascending)
-                                       .entries(newProps.data),
+        let buckets = newProps.bucketedData,
             N_buckets = buckets.length;
 
         this.yScale

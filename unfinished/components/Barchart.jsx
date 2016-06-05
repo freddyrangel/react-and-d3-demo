@@ -34,7 +34,7 @@ class Barchart extends Component {
     }
 
     get barHeight() {
-        let N_buckets = this.buckets.length;
+        let N_buckets = this.props.bucketedData.length;
 
         return (this.drawHeight - N_buckets*3)/N_buckets;
     }
@@ -48,10 +48,7 @@ class Barchart extends Component {
     }
 
     updateD3(props) {
-        let buckets = this.buckets = d3.nest()
-                                       .key(props.value)
-                                       .sortKeys(d3.ascending)
-                                       .entries(props.data),
+        let buckets = props.bucketedData,
             N_buckets = buckets.length;
 
         this.xScale
@@ -69,7 +66,7 @@ class Barchart extends Component {
 
         return (
             <g transform={transform}>
-                {this.buckets.map(({ key, values }, i) => (
+                {this.props.bucketedData.map(({ key, values }, i) => (
                     <LabeledBar x={0}
                                 y={this.yScale(i)}
                                 width={this.xScale(values.length)}
