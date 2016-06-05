@@ -4,6 +4,54 @@ import { findDOMNode }      from 'react-dom';
 import d3                   from 'd3';
 import _                    from 'lodash';
 
+
+class PlotDot extends Component {
+
+    componentWillMount() {
+        this._isMounted = true;
+        this.setState({x: this.props.x,
+                       y: this.props.y});
+    }
+
+    componentWillUnmount() {
+        this._isMounted = false;
+        this.cancelTransitions();
+    }
+
+    componentWillReceiveProps(nextProps) {
+        if (this._isMounted) {
+            if (this.state.x != nextProps.x || this.state.y != nextProps.y) {
+                let node = d3.select(findDOMNode(this));
+
+                node.transition(this.props.transition)
+                    .attr('cx', nextProps.x)
+                    .attr('cy', nextProps.y)
+                    .on('end', () => {
+                        this.setState({x: nextProps.x,
+                                       y: nextProps.y})
+                    });
+            }
+        } else {
+            this.cancelTransitions();
+        }
+    }
+
+    cancelTransitions() {
+        let node = d3.select(findDOMNode(this));
+        node.interrupt();
+    }
+
+    render() {
+        return (
+            <circle cx={this.state.x}
+                    cy={this.state.y}
+                    r={this.props.r}
+                    style={{fillOpacity: .1, strokeOpacity: .3}} />
+        );
+    }
+}
+
+
 class ScatterPlot extends Component {
     xScale = d3.scaleQuantize();
     yScale = d3.scaleQuantize();
@@ -63,16 +111,19 @@ class ScatterPlot extends Component {
         let { x, y, yValue, xValue } = this.props;
 
         let transform = `translate(${x}, ${y})`,
-            data = this.reducedData;
+            data = this.reducedData,
+            transition = d3.transition()
+                           .duration(5000);
 
         return (
             <g transform={transform}>
                 {data.map((d, i) => (
-                    <circle cx={d.x}
-                            cy={d.y}
-                            r={3}
-                            key={`point-${d.id}`}
-                            style={{fillOpacity: .1, strokeOpacity: .3}}/>
+                    <PlotDot x={d.x}
+                             y={d.y}
+                             r={3}
+                             transition={transition}
+                             key={`point-${d.id}`}
+                             style={{fillOpacity: .1, strokeOpacity: .3}}/>
                 ))}
             </g>
         );
