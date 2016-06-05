@@ -5,6 +5,8 @@ import _                    from 'lodash';
 import Barchart             from './components/Barchart';
 import { BucketedScatterPlot } from './components/ScatterPlot';
 import { TopAxis, BottomAxis } from 'components/Axis';
+import Picker               from 'components/Picker';
+
 
 const parseRow = (d) => {
   return {
@@ -32,7 +34,14 @@ const fixRow = (d) => {
 
 export default class App extends Component {
 
-  state = { data : [] };
+    state = { data : [],
+              yKey: 'jobPref',
+              xKey: 'income' };
+
+    qualitativeOptions = ['jobRoleInterest', 'alreadyWorking', 'jobPref', 'jobWherePref', 'jobRelocate'];
+
+    quantitativeOptions = ['expectedEarning', 'age', 'hoursLearning', 'monthsProgramming', 'moneyForLearning', 'commuteTime', 'income'];
+
 
   componentWillMount() {
     d3.csv('./2016-FCC-New-Coders-Survey-Data.csv')
@@ -51,20 +60,44 @@ export default class App extends Component {
     return columns.map((column, i) => <td key={i}>{d[column]}</td>);
   }
 
+    pickY(newKey) {
+        this.setState({yKey: newKey});
+    }
+
+    pickX(newKey) {
+        this.setState({xKey: newKey});
+    }
+
+
   render() {
-      const { data } = this.state;
+      let { xKey, yKey, data } = this.state;
 
       if (data.length === 0) {
           return (<h1>Loading...</h1>)
       } else {
 
           let bucketedData = d3.nest()
-                               .key((d) => d['jobPref'])
+                               .key((d) => d[yKey])
                                .sortKeys(d3.ascending)
                                .entries(data);
 
           return (
               <div className="container">
+                  <h1>FreeCodeCamp Survey Data Explorer</h1>
+                  <div>
+                      Choose X axis
+                      <Picker options={this.quantitativeOptions}
+                              onPick={::this.pickX}
+                              picked={this.state.xKey} />
+                  </div>
+
+                  <div>
+                      Choose Y axis
+                      <Picker options={this.quantitativeOptions.concat(this.qualitativeOptions)}
+                              onPick={::this.pickY}
+                              picked={this.state.yKey} />
+                  </div>
+
                   <svg width="900" height="600">
                       <g>
                           <Barchart x="20"
@@ -72,19 +105,19 @@ export default class App extends Component {
                                     height="500"
                                     width="800"
                                     bucketedData={bucketedData}
-                                    value={(d) => d['jobPref']} />
+                                    value={(d) => d[yKey]} />
 
-                          <BucketedScatterPlot x="225"
+                          <BucketedScatterPlot x="240"
                                                y="100"
                                                height={480}
                                                width={800-220}
                                                bucketedData={bucketedData}
                                                data={data}
-                                               bucket={(d) => d['jobPref']}
-                                               value={(d) => d['income']} />
+                                               bucket={(d) => d[yKey]}
+                                               value={(d) => d[xKey]} />
 
                           <TopAxis data={data}
-                                   value={(d) => d['income']}
+                                   value={(d) => d[xKey]}
                                    maxDimension={800-220}
                                    x={240}
                                    y={95}
