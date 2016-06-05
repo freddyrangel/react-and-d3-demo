@@ -3,8 +3,8 @@ import d3                   from 'd3';
 import _                    from 'lodash';
 
 import Barchart             from './components/Barchart';
-import { BucketedScatterPlot } from './components/ScatterPlot';
-import { TopAxis, BottomAxis } from 'components/Axis';
+import ScatterPlot, { BucketedScatterPlot } from './components/ScatterPlot';
+import { TopAxis, BottomAxis, LeftAxis } from 'components/Axis';
 import Picker               from 'components/Picker';
 
 
@@ -31,6 +31,68 @@ const fixRow = (d) => {
     if (d.expect_earn < 10000) d.expect_earn *= 12;
     return d;
 };
+
+const QualitativeChart = ({ xKey, yKey, data, bucketedData }) => (
+    <g>
+        <Barchart x="20"
+                  y="100"
+                  height="500"
+                  width="800"
+                  bucketedData={bucketedData}
+                  value={(d) => d[yKey]} />
+
+        <BucketedScatterPlot x="240"
+                             y="100"
+                             height={480}
+                             width={800-220}
+                             bucketedData={bucketedData}
+                             data={data}
+                             bucket={(d) => d[yKey]}
+                             value={(d) => d[xKey]} />
+
+        <TopAxis data={data}
+                 value={(d) => d[xKey]}
+                 maxDimension={800-220}
+                 x={240}
+                 y={95}
+                 className="topAxis" />
+
+        <BottomAxis data={bucketedData}
+                    value={(d) => d.values.length}
+                    maxDimension={800-220}
+                    x={240}
+                    y={580}
+                    className="bottomAxis"/>
+    </g>
+);
+
+const QuantitativeChart = ({ xKey, yKey, data, bucketedData }) => (
+    <g>
+        <ScatterPlot x="220"
+                     y="100"
+                     height={480}
+                     width={800-220}
+                     data={data}
+                     yValue={(d) => d[yKey]}
+                     xValue={(d) => d[xKey]}
+                     precision={8} />
+
+        <TopAxis data={data}
+                 value={(d) => d[xKey]}
+                 maxDimension={800-220}
+                 x={220}
+                 y={95}
+                 className="topAxis" />
+
+        <LeftAxis data={data}
+                  value={(d) => d[yKey]}
+                  maxDimension={480}
+                  x={220}
+                  y={100}
+                  className="leftAxis" />
+    </g>
+);
+
 
 export default class App extends Component {
 
@@ -70,7 +132,8 @@ export default class App extends Component {
 
 
   render() {
-      let { xKey, yKey, data } = this.state;
+      let { xKey, yKey, data } = this.state,
+          chart;
 
       if (data.length === 0) {
           return (<h1>Loading...</h1>)
@@ -80,6 +143,19 @@ export default class App extends Component {
                                .key((d) => d[yKey])
                                .sortKeys(d3.ascending)
                                .entries(data);
+
+          if (this.qualitativeOptions.includes(yKey)) {
+              chart = (<QualitativeChart xKey={xKey}
+                                         yKey={yKey}
+                                         data={data}
+                                         bucketedData={bucketedData} />)
+          }else{
+              chart = (<QuantitativeChart xKey={xKey}
+                                          yKey={yKey}
+                                          data={data}
+                                          bucketedData={bucketedData} />)
+          }
+
 
           return (
               <div className="container">
@@ -99,37 +175,7 @@ export default class App extends Component {
                   </div>
 
                   <svg width="900" height="600">
-                      <g>
-                          <Barchart x="20"
-                                    y="100"
-                                    height="500"
-                                    width="800"
-                                    bucketedData={bucketedData}
-                                    value={(d) => d[yKey]} />
-
-                          <BucketedScatterPlot x="240"
-                                               y="100"
-                                               height={480}
-                                               width={800-220}
-                                               bucketedData={bucketedData}
-                                               data={data}
-                                               bucket={(d) => d[yKey]}
-                                               value={(d) => d[xKey]} />
-
-                          <TopAxis data={data}
-                                   value={(d) => d[xKey]}
-                                   maxDimension={800-220}
-                                   x={240}
-                                   y={95}
-                                   className="topAxis" />
-
-                          <BottomAxis data={bucketedData}
-                                      value={(d) => d.values.length}
-                                      maxDimension={800-220}
-                                      x={240}
-                                      y={580}
-                                      className="bottomAxis"/>
-                      </g>
+                      {chart}
                   </svg>
               </div>
           )
